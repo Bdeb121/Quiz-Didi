@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet"> -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color-p: #7700ff;
+            --box-shadow: #7300ff44;
+
+            --bg-light0: #f8f9fc;
+            --bg-light1: #f5f6fc;
+            --bg-light2: #eaecf4;
+            --bg-light3: #dddfeb;
+            --bg-light4: #d1d3e2;
+            --bg-light5: #b7b9cc;
+
+            --bg-dark4: #858796;
+            --bg-dark3: #6e707e;
+            --bg-dark2: #5a5c69;
+            --bg-dark1: #3a3b45;
+            --bg-dark0: #000000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            outline: none;
+        }
+
+        body {
+            background-color: var(--bg-light1);
+            /* font-family: 'Mulish', sans-serif; */
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 16px;
+        }
+
+        /* start portion */
+        .custom-box {
+            max-width: 700px;
+            background-color: var(--bg-light0);
+            border-top: 4px solid var(--bg-color-p);
+            border-bottom: 4px solid var(--bg-color-p);
+            box-shadow: 0 0 12px rgba(0, 0, 0, .3);
+            margin: 40px auto;
+            padding: 30px;
+            border-radius: 12px;
+            animation: anime_1 1.2s ease-in-out;
+        }
+
+        @keyframes anime_1 {
+            0% {
+                transform: translateX(40px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .custom-box::after,
+        .custom-box::before {
+            content: '';
+            clear: both;
+            display: table;
+        }
+
+        .custom-box.hide {
+            display: none;
+        }
+
+        .home-box h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--bg-dark1);
+            margin-bottom: 15px;
+            line-height: 22px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-dark3);
+        }
+
+        .home-box p {
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--bg-dark2);
+            margin-bottom: 10px;
+            line-height: 22px;
+        }
+
+        .home-box p span {
+            font-weight: 600;
+            color: var(--bg-dark1);
+        }
+
+        .home-box .btn {
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--bg-color-p);
+            border: none;
+            color: #fff;
+            border-radius: 6px;
+            font-size: 20px;
+            font-family: 'Mulish', sans-serif;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            box-shadow: 0 0 0 5px var(--box-shadow);
+        }
+
+        /* quiz portion */
+        .quiz-box .question-text,
+        .quiz-box .option-container,
+        .quiz-box .next-question-btn,
+        .quiz-box .answers-indicator {
+            width: 100%;
+            float: left;
+
+        }
+
+        .quiz-box .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--bg-dark4);
+        }
+
+        .quiz-box .question-number,
+        .quiz-box .question-timer {
+            font-size: 22px;
+            color: var(--bg-color-p);
+            font-weight: 600;
+            padding-bottom: 12px;
+            line-height: 22px;
+        }
+
+        .quiz-box .question-text {
+            font-size: 20px;
+            color: var(--bg-dark1);
+            line-height: 20px;
+            font-weight: 560;
+            padding: 20px 0;
+        }
+
+
+        /* .quiz-box .option-container {} */
+
+        .quiz-box .option-container .option {
+            background-color: var(--bg-light2);
+            border-bottom: 2px solid var(--bg-color-p);
+            padding: 13px 15px;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 22px;
+            color: var(--bg-dark0);
+            border-radius: 5px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            text-transform: capitalize;
+            opacity: 0;
+            animation: anim 0.3s ease forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes anim {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .quiz-box .option-container .option.already-answered {
+            pointer-events: none;
+        }
+
+        .quiz-box .option-container .option.correct,
+        .quiz-box .option-container .option.wrong {
+            color: #fff;
+        }
+
+        .quiz-box .option-container .option.correct::before,
+        .quiz-box .option-container .option.wrong::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #00b894;
+            z-index: -1;
+            animation: anima .5s ease forwards;
+        }
+
+        .quiz-box .option-container .option.wrong::before {
+            background-color: #e74c3c;
+        }
+
+        @keyframes anima {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .quiz-box .btn {
+            margin: 16px 0;
+        }
+
+        .quiz-box .answers-indicator {
+            border-top: 2px solid var(--bg-dark4);
+            padding-top: 12px;
+        }
+
+        .quiz-box .answers-indicator div {
+            height: 40px;
+            width: 40px;
+            display: inline-block;
+            background-color: var(--bg-light3);
+            border-radius: 50%;
+            margin-right: 4px;
+            margin-top: 4px;
+        }
+
+
+        .quiz-box .answers-indicator div.correct,
+        .quiz-box .answers-indicator div.wrong {
+            background-color: #00b894;
+            background-image: url("data:image/svg+xml,%3Csvg width='2em' height='2em' viewBox='0 0 16 16' class='bi bi-check' fill='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z'/%3E%3C/svg%3E");
+            /* background-size: 50%;
+            background-repeat: no-repeat;
+            background-position: center; */
+            background-size: cover;
+        }
+
+        .quiz-box .answers-indicator div.wrong {
+            background-color: #e74c3c;
+            background-image: url("data:image/svg+xml,%3Csvg width='2em' height='2em' viewBox='0 0 16 16' class='bi bi-x' fill='currentColor' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' d='M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+        }
+
+        /* Result portion */
+        .result-box {
+            text-align: center;
+        }
+
+        .result-box h1 {
+            font-size: 32px;
+            width: 50%;
+            margin: 0 auto;
+            line-height: 42px;
+            color: var(--bg-color-p);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-dark2);
+        }
+
+        /* .result-box h1 span{
+            padding: 6px;
+            border-radius: 50%;
+            opacity: 0.2;
+            transform: all .4s;
+        }
+
+        .result-box h1 span:hover{
+            opacity: 1;
+        } */
+
+        .result-box table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .result-box table td {
+            border: 2px solid var(--bg-light5);
+            /* #a1a5bb  */
+            padding: 12px 15px;
+            font-weight: 500;
+            color: var(--bg-dark1);
+            width: 50%;
+            text-align: left;
+            font-size: 18px;
+        }
+
+        .total-question,
+        .total-attempt,
+        .total-correct,
+        .total-wrong,
+        .total-percentage,
+        .total-score {
+            color: var(--bg-color-p);
+        }
+
+        .result-box .btn {
+            margin-right: 12px;
+        }
+
+        .result-box .btn:last-child {
+            margin-left: 12px;
+            margin-right: 0px;
+        }
+
+        @media(max-width: 767px) {
+            .result-box .btn {
+                margin-right: 12px;
+                font-size: 18px;
+            }
+
+            body {
+                padding: 12px;
+                font-size: 12px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+            }
+
+            .D {
+                display: none;
+            }
+
+            .result-box h1 {
+                font-size: 24px;
+                width: 72%;
+            }
+            /* .quiz-box .answers-indicator div {
+                margin-right: 8px;
+                margin-top: 8px;
+            } */
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- start portion -->
+    <div class="home-box custom-box">
+        <h3>Instruction :)</h3>
+        <p>
+            Total No of Question :
+            <span class="total-question"></span>
+        </p>
+        <p>
+            Correct :<span> +4</span> <br>
+            Incorrect :<span> -1</span>
+        </p>
+        <button type="button" class="btn" id="startQuiz" onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Quiz portion -->
+    <div class="quiz-box custom-box hide">
+
+        <div class="question-header">
+            <div class="question-number"></div>
+
+            <div class="question-timer"></div>
+        </div>
+
+        <div class="question-text"></div>
+
+        <div class="option-container"></div>
+
+        <div class="next-question-btn">
+            <button type="button" class="btn" id="next" onclick="next()">Next</button>
+        </div>
+
+        <div class="answers-indicator"></div>
+    </div>
+
+    <!-- Result portion -->
+    <div class="result-box custom-box hide">
+        <h1><span>#</span> Quiz Result </h1>
+        <table>
+            <tr>
+                <td> <span class="D">Total</span> Questions</td>
+                <td><span class="total-question"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Attempt</td>
+                <td><span class="total-attempt"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Time Taken</td>
+                <td><span class="total-time"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Correct</td>
+                <td><span class="total-correct"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Wrong</td>
+                <td><span class="total-wrong"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Percentage</td>
+                <td><span class="total-percentage"></span></td>
+            </tr>
+
+            <tr>
+                <td> <span class="D">Total</span> Score</td>
+                <td><span class="total-score"></span></td>
+            </tr>
+        </table>
+
+        <button type="button" class="btn" id="tryAgain" onclick="tryAgain()">Try Again</button>
+        <button type="button" class="btn" id="goToHome" onclick="goToHome()">Go to Home</button>
+    </div>
+
+
+    <script>
+        // Array of Objects
+
+        const quiz = [{
+                question: "What is the largest organ of the human body?",
+                options: ["Brain", "Skeleton", "Heart", "Skin"],
+                answer: 3
+            },
+            {
+                question: "What is the term for cell death?",
+                options: ["Apoptosis", "Mitosis", "Osmosis", "Diffusion"],
+                answer: 0
+            },
+            {
+                question: "What does the acronym DNA stand for?",
+                options: ["Dinitrogen Acetate", "Determined Not Active", "Deoxyribonucleic acid",
+                    "Denucleated actins"
+                ],
+                answer: 2
+            },
+            {
+                question: "Name the process used by plants to convert light energy into chemical energy.",
+                options: ["Photosynthesis", "Mitosis", "Absorption", "Diffusion"],
+                answer: 0
+            },
+            {
+                question: "What is a fertilized egg called?",
+                options: ["Larva", "Zygote", "Embryo", "Fetus"],
+                answer: 1
+            },
+            {
+                question: "Which hormone is associated with the fight-or-flight response?",
+                options: ["Dopamine", "Testosterone", "Thyroid Stimulating Hormone", "Norepinephrine"],
+                answer: 3
+            },
+            {
+                question: "Name the eukaryotic cell organelle that contains the majority of the cell's genetic material.",
+                options: ["Mitochondria", "Nucleus", "Riboflavin", "Golgi body"],
+                answer: 1
+            },
+            {
+                question: "What is the longest bone in the human body?",
+                options: ["Femur", "Tibia", "Fibia", "Humerus"],
+                answer: 0
+            },
+            {
+                question: "Which molecule is used to store energy for cells?",
+                options: ["DNA", "ATP", "RNA", "cAMP"],
+                answer: 1
+            },
+            {
+                question: "How many chromosomes does a person have?",
+                options: ["23", "46", "92", "138"],
+                answer: 1
+            },
+            {
+                question: "What is the chemical symbol for Gold?",
+                options: ["Pb", "Ni", "Au", "Ge"],
+                answer: 2
+            },
+            {
+                question: "Acids release which ion?",
+                options: ["OH-", "H+", "H-", "O-"],
+                answer: 1
+            },
+            {
+                question: "What is a positively charged ion?",
+                options: ["Anion", "Ion", "Electron", "Cation"],
+                answer: 3
+            },
+            {
+                question: "What is the most abundant element in the earth's atmosphere?",
+                options: ["Carbon", "Oxygen", "Nitrogen", "Hydrogen"],
+                answer: 2
+            },
+            {
+                question: "What is the mass of water?",
+                options: ["18 grams", "33 grams", "3 grams", "28 grams"],
+                answer: 0
+            },
+            {
+                question: "What is the first element listed on the Periodic Table?",
+                options: ["Helium", "Carbon", "Hydrogen", "Nitrogen"],
+                answer: 2
+            },
+            {
+                question: "A covalent bond is the linkage of two atoms by the sharing of what?",
+                options: ["2 ions", "2 electrons", "3 elements", "1 reaction"],
+                answer: 1
+            },
+            {
+                question: "What is released in an endothermic reaction?",
+                options: ["Hydrogen", "Oxygen", "Heat", "Water"],
+                answer: 2
+            },
+            {
+                question: "Avogadro's constant represents the number of particles of a substance for which unit of measurement?",
+                options: ["Mass", "Mole", "Molecule", "Micrometer"],
+                answer: 1
+            },
+            {
+                question: "What is the most abundant metal in the earth's crust?",
+                options: ["Calcium", "Sodium", "Aluminum", "Iron"],
+                answer: 2
+            },
+            {
+                question: "What year was Facebook founded?",
+                options: ["2001", "2002", "2003", "2004"],
+                answer: 3
+            },
+            {
+                question: "What does GUI stand for?",
+                options: ["Graphical User Interface", "Golfing Union of Ireland", "Global Unique Identifier",
+                    "Graphics Unit Interface"
+                ],
+                answer: 0
+            },
+            {
+                question: "The companies HP, Microsoft, and Apple were all started in a what?",
+                options: ["Bedroom", "Kitchen", "Garage", "Office"],
+                answer: 2
+            },
+            {
+                question: "What is the most used password?",
+                options: ["password", "123456", "111111", "admin"],
+                answer: 1
+            },
+            {
+                question: "The term 'debugging' was established by Rear Admiral Grace Hopper after removing what from a computer?",
+                options: ["a rat", "a beetle", "a moth", "a spider web"],
+                answer: 2
+            },
+            {
+                question: "What was the first registered domain name?",
+                options: ["computers.com", "apple.com", "ibm.com", "symbolics.com"],
+                answer: 3
+            },
+            {
+                question: "What was the first computer mouse made from?",
+                options: ["Wood", "Plastic", "Metal", "Glass"],
+                answer: 0
+            },
+            {
+                question: "This person is often called the inventor of the modern computer, and created the first fully electronic computer.",
+                options: ["William Gates", "Steve Wozniak", "Konrad Zuse", "Steve Jobs"],
+                answer: 2
+            },
+            {
+                question: "Who is credited for developing what is known as the first computer program?",
+                options: ["Charles Babbage", "Ada Lovelace", "Konrad Zuse", "Bill Gates"],
+                answer: 1
+            },
+            {
+                question: "What does CPU stand for?",
+                options: ["Computer Processing Unit", "Central Peripheral Unit", "Central Processing Unit",
+                    "Computer Processing User"
+                ],
+                answer: 2
+            },
+            {
+                question: "What food is hummus made from?",
+                options: ["Tofu", "Chick peas", "Rice", "Corn"],
+                answer: 1
+            },
+            {
+                question: "What is the most popular spice in the world?",
+                options: ["Pepper", "Nutmeg", "Curry", "Cumin"],
+                answer: 3
+            },
+            {
+                question: "A pound of honey is the result of honey bees visiting how many flowers?",
+                options: ["10,000", "1,000,000", "2,000,000", "10,000,000"],
+                answer: 2
+            },
+            {
+                question: "Americans spend approximately how much money on beer on an annual basis?",
+                options: ["1 billion", "5 billion", "20 billion", "25 billion"],
+                answer: 3
+            },
+            {
+                question: "What organs does Haggis, the nation dish of Scotland, NOT contain?",
+                options: ["Heart", "Liver", "Lungs", "Brain"],
+                answer: 3
+            },
+            {
+                question: "Where was the ice cream sundae invented?",
+                options: ["England", "USA", "Germany", "Australia"],
+                answer: 1
+            },
+            {
+                question: "When was sliced bread first available for sale?",
+                options: ["1952", "1916", "1930", "1947"],
+                answer: 2
+            },
+            {
+                question: "What is used to enhance the color of red meat?",
+                options: ["Red dyes", "Carbon monoxide", "Preservatives", "Formaldehyde"],
+                answer: 1
+            },
+            {
+                question: "What is the most commonly eaten fish in the world?",
+                options: ["Tilapia", "Salmon", "Tuna", "Herring"],
+                answer: 3
+            },
+            {
+                question: "What is the sense of taste that allows us to detect savory foods?",
+                options: ["Salt", "Savory", "Umami", "Bitter"],
+                answer: 2
+            }
+        ];
+
+    
+        const questionNumber = document.querySelector('.question-number');
+        const questionText = document.querySelector('.question-text');
+        const optionContainer = document.querySelector('.option-container');
+        const answerIndicatorContainer = document.querySelector('.answers-indicator');
+        const homeBox = document.querySelector('.home-box');
+        const quizBox = document.querySelector('.quiz-box');
+        const resultBox = document.querySelector('.result-box');
+
+        let questionCounter = 0;
+        let currentQuestion;
+        let availableQuestions = [];
+        let availableOptions = [];
+
+        let correctAnswers = 0;
+        let attempt = 0;
+
+
+        // Push the question into availableQuestions Array
+        function setAvailableQuestions() {
+            const totalQuestion = quiz.length;
+            for (let i = 0; i < totalQuestion; i++) {
+                availableQuestions.push(quiz[i]);
+            }
+            // console.log(availableQuestions);
+        }
+
+        // set Question No and Options
+        function getNewQuestion() {
+
+            // 1.set question Number
+            questionNumber.innerHTML = `Question ${questionCounter + 1} of ${quiz.length}`;
+
+            // 2.set question Text
+            // get random question
+            const questionIndex = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+            currentQuestion = questionIndex;
+            questionText.innerHTML = 'Q. ' + currentQuestion.question;
+
+            // get the position of 'questionIndex' from the available question array
+            const index1 = availableQuestions.indexOf(questionIndex);
+            // remove the 'questionIndex' from the available question array,
+            // so that the question does not repeat
+            availableQuestions.splice(index1, 1);
+
+            // 3.set options
+            // get the length of options
+            const optionLen = currentQuestion.options.length;
+            // Push options into availableOptions array
+            for (let i = 0; i < optionLen; i++) {
+                availableOptions.push(i);
+            }
+
+            optionContainer.innerHTML = '';
+            let animationDelay = .2;
+            // Create options in HTML
+            for (let i = 0; i < optionLen; i++) {
+                // Random options
+                const optionIndex = availableOptions[Math.floor(Math.random() * availableOptions.length)];
+                // get the position of 'optionIndex' from the availableOptions
+                const index2 = availableOptions.indexOf(optionIndex);
+                // remove the 'optionIndex' from the availableOptions, so that the option does not repeat
+                availableOptions.splice(index2, 1)
+                const option = document.createElement('div');
+                option.innerHTML = currentQuestion.options[optionIndex];
+                option.id = optionIndex;
+                option.style.animationDelay = animationDelay + 's';
+                animationDelay += .2;
+                option.className = 'option';
+                optionContainer.appendChild(option);
+                option.setAttribute('onclick', 'getResult(this)');
+            }
+
+            questionCounter++
+        }
+
+        function getResult(element) {
+            const id = parseInt(element.id);
+            // get the answer by comparing the id of clicked option
+            if (id === currentQuestion.answer) {
+                // set the green color to the correct option
+                element.classList.add('correct');
+                // add the indicator to the correct mark
+                updateAnswerIndicator('correct');
+                correctAnswers++;
+            } else {
+                // set the red color to the wrong  option
+                element.classList.add('wrong');
+                // add the indicator to the wrong mark
+                updateAnswerIndicator('wrong');
+
+                // if the answer is incorrect then show the 
+                // correct option by adding green color to the option
+                const optionLen = optionContainer.children.length;
+                for (let i = 0; i < optionLen; i++) {
+                    if (parseInt(optionContainer.children[i].id) === currentQuestion.answer) {
+                        optionContainer.children[i].classList.add('correct');
+                    }
+                }
+            }
+            attempt++
+            unClickableOptions()
+        }
+
+        // make all the option unClickable  once the user select a option
+        function unClickableOptions() {
+            const optionLen = optionContainer.children.length;
+            for (let i = 0; i < optionLen; i++) {
+                optionContainer.children[i].classList.add('already-answered')
+            }
+        }
+
+        function answerIndicator() {
+            const totalQuestion = quiz.length;
+            for (let i = 0; i < totalQuestion; i++) {
+                const indicator = document.createElement('div');
+                answerIndicatorContainer.appendChild(indicator);
+            }
+        }
+
+        function updateAnswerIndicator(markType) {
+            answerIndicatorContainer.children[questionCounter - 1].classList.add(markType);
+        }
+
+        // document.querySelector('#next').addEventListener('click', next);
+        function next() {
+            if (questionCounter === quiz.length) {
+                quizOver();
+                sessionStorage.setItem('time', `${minutes} min and ${seconds} sec`);
+            } else {
+                getNewQuestion();
+            }
+        };
+
+        function quizOver() {
+            // hide quizBox
+            quizBox.classList.add('hide');
+            // show resultBox
+            resultBox.classList.remove('hide');
+            quizResult()
+        }
+
+        // get the quiz result
+        function quizResult() {
+            resultBox.querySelector('.total-question').innerHTML = quiz.length;
+            resultBox.querySelector('.total-attempt').innerHTML = attempt;
+            resultBox.querySelector('.total-correct').innerHTML = correctAnswers;
+            resultBox.querySelector('.total-wrong').innerHTML = attempt - correctAnswers;
+            resultBox.querySelector('.total-percentage').innerHTML = ((correctAnswers / quiz.length) * 100).toFixed(2) +
+                '%';
+            resultBox.querySelector('.total-score').innerHTML = ((correctAnswers * 4) - (attempt - correctAnswers)) + ' / ' + (quiz.length * 4);
+            
+            resultBox.querySelector('.total-time').innerHTML = attempt;
+        }
+
+        function resetQuiz() {
+            questionCounter = 0;
+            correctAnswers = 0;
+            attempt = 0;  
+        }
+
+        // document.querySelector('#tryAgain').addEventListener('click', tryAgain)
+        function tryAgain() {
+            // hide the resultBox
+            resultBox.classList.add('hide');
+            // show the quizBox
+            quizBox.classList.remove('hide');
+            resetQuiz();
+            startQuiz();
+        };
+
+        // document.querySelector('#goToHome').addEventListener('click', goToHome )
+        function goToHome() {
+            // hide the resultBox
+            resultBox.classList.add('hide');
+            // show the quizBox
+            homeBox.classList.remove('hide');
+            resetQuiz();
+        };
+
+
+        // Timer
+        function timer(){
+            let dt = new Date(new Date().setTime(0));
+            let time = dt.getTime();
+            let seconds = Math.floor((time % (100 * 60)) / 1000);
+            let minutes = Math.floor((time % (1000 * 60 * 60)) / 1000);
+
+            setInterval(function(){
+                if(seconds < 59){
+                    seconds++;
+                }else{
+                    minutes++
+                    seconds = 0;
+                }
+                
+                let sec = seconds < 10 ? `0${seconds}` : `${seconds}`;
+                let min = minutes < 10 ? `0${minutes}` : `${minutes}`;
+                let show = document.querySelector('.question-timer');
+                show.innerHTML = `${min} : ${sec}`;
+            }, 1000);
+
+        }
+
+
+        // store time
+        function store(){
+            // console.log(time_store);
+            
+        }
+
+        store();
+
+        // ##### STARTING POINT #####
+
+        function startQuiz() {
+
+            // hide homeBox
+            homeBox.classList.add('hide');
+
+            // show quizBox
+            quizBox.classList.remove('hide');
+
+            // first we will set all the questions
+            setAvailableQuestions();
+
+            // second we will call getNewQuestion() function
+            getNewQuestion();
+
+            // to create indicator of answer
+            answerIndicator();
+
+            // set the timer
+            timer()
+        };
+
+        window.onload = function () {
+            homeBox.querySelector('.total-question').innerHTML = quiz.length;
+        }
+    </script>
+</body>
+
+</html>
